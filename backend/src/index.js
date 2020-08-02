@@ -1,5 +1,5 @@
 const express = require("express");
-const { uuid } = require("uuidv4");
+const { uuid, isUuid } = require("uuidv4");
 
 const app = express();
 
@@ -24,14 +24,50 @@ app.use(express.json());
  *
  */
 
+ /**
+  * Middleware:
+  * 
+  * Interceptador de requisições que interromper totalmente a requisição ou altera dados da requisição
+  */
+
 const projects = [];
+
+function logRequests(request, response, next){
+  const { method, url } = request;
+
+  const logLabel = `[${method.toUpperCase()}] ${url}`
+
+  console.log('1')
+  console.time(logLabel)
+
+  next() // Proximo middleware
+  
+  console.log('2')
+  console.timeEnd(logLabel)
+}
+
+function validateProjectId(request, response, next){
+  const {id} = request.params
+  if(!isUuid(id)){
+    return response.status(400).json({ error: 'ID do projeto invalido.'})
+  }
+  return next()
+}
+
+
+app.use(logRequests)
+app.use('/projects/:id', validateProjectId)
+
+
 
 app.get("/", (request, response) => {
   const { title, owner } = request.query;
 
   return response.send(`Hello Word ${title} da ${owner}`);
 });
-app.get("/projects", (request, response) => {
+app.get("/projects", /*logRequests,*/ (request, response) => {
+  console.log('3')
+
   const { title } = request.query
 
   const results = title
