@@ -4,3 +4,4 @@ yarn add @babel/preset-env @babel/preset-react webpack webpack-cli
 
 yarn add @babel/cli @babel/core
 yarn babel src/index.js --out-file public/budle.js
+npm i babel-loader
